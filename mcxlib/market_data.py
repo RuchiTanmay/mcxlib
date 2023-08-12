@@ -146,14 +146,17 @@ def get_put_call_ratio():
 
 
 def get_category_wise_oi(year:str = '2023', month:str = 'June'):
-    url="https://www.mcxindia.com/docs/default-source/market-data/historicaldata/2023/july/category-wise-oi-jul-2023.xlsx"
+    url=f"https://www.mcxindia.com/docs/default-source/market-data/historicaldata/{year}/{month.lower()}/" \
+        f"category-wise-oi-jul-2023.xlsx"
+    #TODO: dynamic file name
     data_df = pd.read_excel(url)
     return data_df
 
 
 def get_category_wise_turnover(year:str = '2023', month:str = 'June'):
-    url="https://www.mcxindia.com/docs/default-source/market-data/historicaldata/2023/june/" \
+    url=f"https://www.mcxindia.com/docs/default-source/market-data/historicaldata/{year}/{month.lower()}/" \
         "category-wise-turnover-jun-2023.xlsx"
+    # TODO: dynamic file name
     data_df = pd.read_excel(url)
     return data_df
 
