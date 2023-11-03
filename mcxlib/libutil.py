@@ -1,22 +1,25 @@
+from datetime import datetime
 import os
-from datetime import datetime, timedelta, date
-import requests
-import numpy as np
-from dateutil.relativedelta import relativedelta
-import pandas as pd
-from mcxlib.constants import *
-from mcxlib.logger import mylogger
 
 header = {
-    "Connection": "keep-alive",
-    "Cache-Control": "max-age=0",
-    "DNT": "1",
-    "Upgrade-Insecure-Requests": "1",
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-                  "Chrome/111.0.0.0 Safari/537.36",
-    "Sec-Fetch-User": "?1", "Accept": "*/*", "Sec-Fetch-Site": "none", "Sec-Fetch-Mode": "navigate",
-    "Accept-Encoding": "gzip, deflate, br", "Accept-Language": "en-US,en;q=0.9,hi;q=0.8"
-    }
+        'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Connection': 'keep-alive',
+        'Content-Length': '0',
+        'Content-Type': 'application/json',
+        'Cookie': 'ASP.NET_SessionId=p4dkpr24k2j2ck1w2qnov1h5',
+        'Origin': 'https://www.mcxindia.com',
+        'Referer': 'https://www.mcxindia.com/market-data/market-watch',
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'same-origin',
+        'Sec-GPC': '1',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36',
+        'X-Requested-With': 'XMLHttpRequest',
+        'sec-ch-ua': '"Chromium";v="118", "Brave";v="118", "Not=A?Brand";v="99"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"Windows"'
+        }
 
 
 class CalenderNotFound(Exception):
@@ -31,63 +34,37 @@ class MCXdataNotFound(Exception):
         super(MCXdataNotFound, self).__init__(message)
 
 
-def validate_date_param(from_date:str, to_date:str, period:str):
-    if not period and (not from_date or not to_date):
-        raise ValueError(' Please provide the valid parameters')
-    elif period and period.upper() not in equity_periods:
-        raise ValueError(f'period = {period} is not a valid value')
+def get_headers(use_for:str = 'market-watch'):
+    return {
+        'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Connection': 'keep-alive',
+        'Content-Length': '0',
+        'Content-Type': 'application/json',
+        'Origin': 'https://www.mcxindia.com',
+        'Referer': f'https://www.mcxindia.com/market-data/{use_for}',
+        'Sec-GPC': '1',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36',
+        'X-Requested-With': 'XMLHttpRequest',
+        'sec-ch-ua': '"Chromium";v="118", "Brave";v="118", "Not=A?Brand";v="99"',
+        'sec-ch-ua-platform': '"Windows"'
+    }
 
+
+def validate_date_param(start_date:str, end_date:str):
+    if not start_date or not end_date:
+        raise ValueError(' Please provide the valid parameters')
     try:
-        if not period:
-            from_date = datetime.strptime(from_date, dd_mm_yyyy)
-            to_date = datetime.strptime(to_date, dd_mm_yyyy)
-            time_delta = (to_date - from_date).days
-            if time_delta < 1:
-                raise ValueError(f'to_date should greater than from_date ')
+        start_date = datetime.strptime(start_date, '%Y%m%d')
+        end_date = datetime.strptime(end_date, '%Y%m%d')
+        time_delta = (end_date - start_date).days
+        if time_delta < 1:
+            raise ValueError(f'end_date should greater than start_date ')
+        elif time_delta > 365:
+            raise ValueError(f'Date range cannot be greater than 365 days')
     except Exception as e:
         print(e)
-        raise ValueError(f'either or both from_date = {from_date} || to_date = {to_date} are not valid value')
-
-
-def derive_from_and_to_date(from_date:str = None, to_date:str = None, period:str = None):
-    if not period:
-        return from_date, to_date
-    today = date.today()
-    conditions = [period.upper()=='1D',
-                  period.upper()=='1W',
-                  period.upper()=='1M',
-                  period.upper()=='6M',
-                  period.upper()=='1Y'
-                  ]
-    value = [today - timedelta(days=1),
-             today - timedelta(weeks=1),
-             today - relativedelta(months=1),
-             today - relativedelta(months=6),
-             today - relativedelta(months=12)]
-
-    f_date = np.select(conditions,value, default=(today - timedelta(days=1)))
-    from_date = pd.to_datetime(str(f_date)).strftime(dd_mm_yyyy)
-    today = today.strftime(dd_mm_yyyy)
-    return from_date, today
-
-
-def cleaning_column_name(col:list):
-    unwanted_str_list = ['FH_', 'EOD_', 'HIT_']
-    new_col=col
-    for unwanted in unwanted_str_list:
-        new_col = [name.replace(f'{unwanted}', '') for name in new_col]
-    return new_col
-
-
-def cleaning_mcs_symbol(symbol):
-    symbol = symbol.replace('&','%26')  #URL Parse for Stocks Like M&M Finance
-    return symbol.upper()
-
-
-def mcx_urlfetch(url):
-    r_session = requests.session()
-    mcx_live = r_session.get("https://www.mcxindia.com/home", headers=header)
-    return r_session.get(url, headers=header)
+        raise ValueError(f'either or both start_date = {start_date} || end_date = {end_date} are not valid value')
 
 
 def get_mcxlib_path():
