@@ -1,6 +1,6 @@
 # mcxlib 0.1
 
-Python Library to get publicly available data on new MCX website.
+Python Library to get publicly available data on MCX website.
 
 Release Notes
 * Compatible and Tested with Python 3.8 and above 
@@ -12,7 +12,7 @@ Release Notes
 - pandas
 - lxml
 
-For Windows systems you can install Anaconda, this will cover many dependencies (You'll have to install requests and beautifulsoup additionally though)
+For Windows systems you can install Anaconda, this will cover many dependencies (You'll have to install requests additionally though)
 
 ## Installation
 Fresh installation 
@@ -25,6 +25,7 @@ Upgrade
 
 ## Function list
 
+* get_recent_expires
 * get_market_watch
 * get_top_gainers
 * get_heat_map
@@ -52,6 +53,8 @@ data = get_live_market_watch()
 bhav_copy = get_bhav_copy(trade_date= '20231102', instrument = 'ALL')
 
 option_chain = get_option_chain(commodity = 'CRUDEOIL', expiry = '15NOV2023')
+
+cli_details = get_pro_cli_details(trade_month = '202301')
 
 NB: always follow the function hint to apply valid parameter.
                                             
