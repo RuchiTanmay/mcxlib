@@ -13,8 +13,9 @@ setuptools.setup(
     long_description_content_type="text/markdown", author='RuchiTanmay',
     author_email='ruchitanmay@gmail.com',
     url='https://github.com/RuchiTanmay/mcxlib',
-    install_requires=['requests', 'pandas', 'scipy'],
-    keywords=['mcx', 'mcx india', 'python', 'mcx data', 'mcx history data', 'commodity'],
+    install_requires=['requests', 'pandas'],
+    keywords=['mcx', 'mcx india', 'python', 'mcx data', 'mcx history data', 'commodity', 'mcx python',
+              'mcx python library', 'mcx library'],
     classifiers=[
         'Intended Audience :: Developers',
         'Natural Language :: English',
