@@ -5,6 +5,27 @@ import json
 import calendar
 
 
+def get_recent_expires(commodity:str = 'ALL') -> pd.DataFrame:
+    """
+    get recent expiry for commodity
+    :param commodity: any of the list ['ALL', 'CRUDEOIL', 'COPPER', 'GOLD', 'GOLDM', 'NATURALGAS', 'SILVER', 'SILVERM', 'ZINC']
+    :return: panda dataframe
+    """
+    url = "https://www.mcxindia.com/backpage.aspx/GetExpirywisePutCallRatio"
+    payload = {}
+    headers = get_headers(use_for='put-call-ratio')
+    try:
+        data_dict = requests.post(url, headers=headers, data=payload).json()
+        data_df = pd.DataFrame.from_dict(data_dict['d']['Data'])
+        data_df.drop(columns=['ExtensionData', 'Date', 'Ratio'], inplace=True)
+    except Exception as e:
+        raise ValueError(f" data not found / Invalid request  : MCX error:{e}")
+    if not commodity == 'ALL':
+        data_df = data_df[data_df['Symbol'] == commodity]
+    if data_df.empty:
+        raise ValueError("Apply a valid commodity name")
+    return data_df
+
 def get_market_watch() -> pd.DataFrame:
     """
     get live market watch on MCX
@@ -117,7 +138,7 @@ def get_most_active_puts_calls(option_type:str = 'PE',
     return data_df
 
 
-def get_bhav_copy(trade_date:str = '20231102',
+def get_bhav_copy(trade_date:str = '20230102',
                   instrument:str = 'ALL') -> pd.DataFrame:
     """
     get bhav copy
@@ -346,9 +367,9 @@ def get_trading_statistics(year:int = 2023, month_number:int = 9) -> pd.DataFram
     return data_df
 
 
-if __name__ == '__main__':
-    df = get_trading_statistics()
-    print(df.columns)
-    print(df)
+# if __name__ == '__main__':
+#     df = get_recent_expires(commodity='COPPE')
+#     print(df.columns)
+#     print(df)
 
 

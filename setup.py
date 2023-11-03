@@ -8,7 +8,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     version='0.1',
     include_package_data=True,
-    description='library to get NSE India data',
+    description='python library to get MCX India data',
     long_description=long_description,
     long_description_content_type="text/markdown", author='RuchiTanmay',
     author_email='ruchitanmay@gmail.com',
