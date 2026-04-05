@@ -1,6 +1,5 @@
 import pandas as pd
-import requests
-from mcxlib.libutil import *
+from .libutil import *
 import json
 import calendar
 
@@ -15,7 +14,7 @@ def get_recent_expires(commodity:str = 'ALL') -> pd.DataFrame:
     payload = {}
     headers = get_headers(use_for='put-call-ratio')
     try:
-        data_dict = requests.post(url, headers=headers, data=payload).json()
+        data_dict = post_json(url, headers=headers, payload=payload)
         data_df = pd.DataFrame.from_dict(data_dict['d']['Data'])
         data_df.drop(columns=['ExtensionData', 'Date', 'Ratio'], inplace=True)
     except Exception as e:
@@ -35,7 +34,7 @@ def get_market_watch() -> pd.DataFrame:
     payload = {}
     headers = get_headers(use_for='market-watch')
     try:
-        data_dict = requests.request("POST", url, headers=headers, data=payload).json()
+        data_dict = post_json(url, headers=headers, payload=payload)
         data_df = pd.DataFrame.from_dict(data_dict['d']['Data'])
         data_df.drop(columns=['__type', 'LTT'], inplace=True)
     except Exception as e:
@@ -52,7 +51,7 @@ def get_heat_map() -> pd.DataFrame:
     payload = {}
     headers = get_headers(use_for='heatmap')
     try:
-        data_dict = requests.post(url, headers=headers, data=payload).json()
+        data_dict = post_json(url, headers=headers, payload=payload)
         data_df = pd.DataFrame.from_dict(data_dict['d']['Data'])
         data_df.drop(columns=['__type', 'Dttm'], inplace=True)
     except Exception as e:
@@ -69,7 +68,7 @@ def get_top_gainers() -> pd.DataFrame:
     payload = {}
     headers = get_headers(use_for='top-gainers')
     try:
-        data_dict = requests.post(url, headers=headers, data=payload).json()
+        data_dict = post_json(url, headers=headers, payload=payload)
         data_df = pd.DataFrame.from_dict(data_dict['d']['Data'])
         data_df.drop(columns=['ExtensionData', 'LTT'], inplace=True)
     except Exception as e:
@@ -86,7 +85,7 @@ def get_top_losers() -> pd.DataFrame:
     payload = {}
     headers = get_headers(use_for='top-losers')
     try:
-        data_dict = requests.post(url, headers=headers, data=payload).json()
+        data_dict = post_json(url, headers=headers, payload=payload)
         data_df = pd.DataFrame.from_dict(data_dict['d']['Data'])
         data_df.drop(columns=['ExtensionData', 'LTT'], inplace=True)
     except Exception as e:
@@ -106,7 +105,7 @@ def get_most_active_contracts(instrument:str = 'ALL') -> pd.DataFrame:
                             "InstrumentType": f'{instrument}'
                         })
     try:
-        data_dict = requests.request("POST", url, headers=headers, data=payload).json()
+        data_dict = post_json(url, headers=headers, payload=payload)
         data_df = pd.DataFrame.from_dict(data_dict['d']['Data'])
         data_df.drop(columns=['ExtensionData', 'Date', 'Unit'], inplace=True)
     except Exception as e:
@@ -130,7 +129,7 @@ def get_most_active_puts_calls(option_type:str = 'PE',
     payload_param = {'OptionType':f'{option_type}','Product':f'{product}','InstrumentType':f'{instrument}'}
     payload = f"{payload_param}"
     try:
-        data_dict = requests.request("POST", url, headers=headers, data=payload).json()
+        data_dict = post_json(url, headers=headers, payload=payload)
         data_df = pd.DataFrame.from_dict(data_dict['d']['Data'])
         data_df.drop(columns=['ExtensionData', 'LTT'], inplace=True)
     except Exception as e:
@@ -151,7 +150,7 @@ def get_bhav_copy(trade_date:str = '20230102',
     payload_param = {'Date': f'{trade_date}', 'InstrumentName': f'{instrument}'}
     payload = f"{payload_param}"
     try:
-        data_dict = requests.request("POST", url, headers=headers, data=payload).json()
+        data_dict = post_json(url, headers=headers, payload=payload)
         data_df = pd.DataFrame.from_dict(data_dict['d']['Data'])
         data_df.drop(columns='__type', inplace=True)
     except Exception as e:
@@ -181,7 +180,7 @@ def get_historical_date_wise_data(start_date:str = '20230101',
                         })
     validate_date_param(start_date=start_date, end_date=end_date)
     try:
-        data_dict = requests.request("POST", url, headers=headers, data=payload).json()
+        data_dict = post_json(url, headers=headers, payload=payload)
         data_df = pd.DataFrame.from_dict(data_dict['d']['Data'])
         data_df['Date'] = pd.to_datetime(data_df['Date'])
         data_df.drop(columns=['__type', 'Year', 'Month'], inplace=True)
@@ -202,7 +201,7 @@ def get_mcx_icomdex_indices() -> pd.DataFrame:
     })
     headers = get_headers(use_for='mcx-icomdex-indices')
     try:
-        data_dict = requests.post(url, headers=headers, data=payload).json()
+        data_dict = post_json(url, headers=headers, payload=payload)
         data_df = pd.DataFrame.from_dict(data_dict['d']['Data'])
         data_df.drop(columns=['__type'], inplace=True)
     except Exception as e:
@@ -223,10 +222,10 @@ def get_pro_cli_details(trade_month:str = '202301') -> pd.DataFrame:
         "Segment": "ALL",
         "CommodityHead": "ALL",
         "Commodity": "ALL",
-        "Startdate": f"{trade_month}"
+                            "Startdate": f"{trade_month}"
     })
     try:
-        data_dict = requests.request("POST", url, headers=headers, data=payload).json()
+        data_dict = post_json(url, headers=headers, payload=payload)
         data_df = pd.DataFrame.from_dict(data_dict['d']['Data'])
         data_df['Date'] = pd.to_datetime(data_df['Date'])
         data_df.drop(columns=['ExtensionData', 'TradingDate', 'Date'], inplace=True)
@@ -247,7 +246,7 @@ def get_option_chain(commodity:str = 'CRUDEOIL', expiry:str = '15NOV2023') -> pd
     payload_param = {'Commodity':f'{commodity}','Expiry':f'{expiry}'}
     payload = f"{payload_param}"
     try:
-        data_dict = requests.request("POST", url, headers=headers, data=payload).json()
+        data_dict = post_json(url, headers=headers, payload=payload)
         data_df = pd.DataFrame.from_dict(data_dict['d']['Data'])
         data_df.drop(columns=['ExtensionData', 'PE_LTT', 'CE_LTT', 'LTT', 'Symbol'], inplace=True)
         data_df = data_df[(data_df['CE_OpenInterest']>0) | (data_df['PE_OpenInterest']>0)].copy()
@@ -273,7 +272,7 @@ def get_put_call_ratio(ratio_type:str = 'expiry_wise') -> pd.DataFrame:
     payload = {}
     headers = get_headers(use_for='put-call-ratio')
     try:
-        data_dict = requests.post(url, headers=headers, data=payload).json()
+        data_dict = post_json(url, headers=headers, payload=payload)
         data_df = pd.DataFrame.from_dict(data_dict['d']['Data'])
         data_df.drop(columns=['ExtensionData', 'Date'], inplace=True)
     except Exception as e:

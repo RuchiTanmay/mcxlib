@@ -1,5 +1,6 @@
 from datetime import datetime
 import os
+import requests
 
 header = {
         'Accept': 'application/json, text/javascript, */*; q=0.01',
@@ -73,6 +74,24 @@ def get_mcxlib_path():
     """
     mydir = os.getcwd()
     return mydir.split(r'\mcxlib', 1)[0]
+
+
+def post_json(url: str, headers: dict, payload, timeout: int = 30):
+    session = requests.Session()
+    session.trust_env = False
+    response = session.post(url, headers=headers, data=payload, timeout=timeout)
+    if not response.ok:
+        excerpt = " ".join(response.text.split())
+        if len(excerpt) > 220:
+            excerpt = excerpt[:220]
+        raise MCXdataNotFound(f"HTTP {response.status_code} for {url}: {excerpt}")
+    try:
+        return response.json()
+    except ValueError as exc:
+        excerpt = " ".join(response.text.split())
+        if len(excerpt) > 220:
+            excerpt = excerpt[:220]
+        raise MCXdataNotFound(f"Invalid JSON from {url}: {excerpt}") from exc
 
 
 
