@@ -41,4 +41,4 @@ __all__ = [
     "get_trading_statistics",
 ]
 
-__version__ = "0.1"
+__version__ = "0.2"
