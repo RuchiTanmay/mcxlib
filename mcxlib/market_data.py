@@ -25,12 +25,13 @@ def get_recent_expires(commodity:str = 'ALL') -> pd.DataFrame:
         raise ValueError("Apply a valid commodity name")
     return data_df
 
+
 def get_market_watch() -> pd.DataFrame:
     """
     get live market watch on MCX
     :return: panda dataframe
     """
-    url="https://www.mcxindia.com/backpage.aspx/GetMarketWatch"
+    url = "https://www.mcxindia.com/backpage.aspx/GetMarketWatch"
     payload = {}
     headers = get_headers(use_for='market-watch')
     try:
@@ -47,7 +48,7 @@ def get_heat_map() -> pd.DataFrame:
     get live market heat map on MCX
     :return: panda dataframe
     """
-    url="https://www.mcxindia.com/backpage.aspx/GetHeatMap"
+    url = "https://www.mcxindia.com/backpage.aspx/GetHeatMap"
     payload = {}
     headers = get_headers(use_for='heatmap')
     try:
@@ -146,7 +147,7 @@ def get_bhav_copy(trade_date:str = '20230102',
     :return: panda dataframe
     """
     headers = get_headers(use_for='bhavcopy')
-    url="https://www.mcxindia.com/backpage.aspx/GetDateWiseBhavCopy"
+    url = "https://www.mcxindia.com/backpage.aspx/GetDateWiseBhavCopy"
     payload_param = {'Date': f'{trade_date}', 'InstrumentName': f'{instrument}'}
     payload = f"{payload_param}"
     try:
@@ -222,7 +223,7 @@ def get_pro_cli_details(trade_month:str = '202301') -> pd.DataFrame:
         "Segment": "ALL",
         "CommodityHead": "ALL",
         "Commodity": "ALL",
-                            "Startdate": f"{trade_month}"
+        "Startdate": f"{trade_month}"
     })
     try:
         data_dict = post_json(url, headers=headers, payload=payload)
@@ -265,7 +266,7 @@ def get_put_call_ratio(ratio_type:str = 'expiry_wise') -> pd.DataFrame:
     """
     if ratio_type =='expiry_wise':
         url = "https://www.mcxindia.com/backpage.aspx/GetExpirywisePutCallRatio"
-    elif ratio_type =='commodity_wise':
+    elif ratio_type == 'commodity_wise':
         url = "https://www.mcxindia.com/backpage.aspx/GetCommoditywisePutCallRatio"
     else:
         raise ValueError(" Please apply valid ratio type")
@@ -290,7 +291,7 @@ def get_category_wise_turnover(year:int = 2023, month_number:int = 9) -> pd.Data
     month_long = calendar.month_name[month_number].lower()
     month_short = calendar.month_abbr[month_number].lower()
     try:
-        url=f"https://www.mcxindia.com/docs/default-source/market-data/historicaldata/{str(year)}/{month_long}/" \
+        url = f"https://www.mcxindia.com/docs/default-source/market-data/historicaldata/{str(year)}/{month_long}/" \
             f"category-wise-turnover-{month_short}-{str(year)}.xlsx"
         data_df = pd.read_excel(url, skiprows=2, skipfooter=9)
     except Exception as e:
@@ -330,9 +331,9 @@ def get_ccl_delivery(year:int = 2023, month_number:int = 9) -> pd.DataFrame:
     :return: pandas dataframe
     """
     month_long = calendar.month_name[month_number].lower()
-    month_short = calendar.month_abbr[month_number].lower()
+    # month_short = calendar.month_abbr[month_number].lower()
     try:
-        url=f"https://www.mcxindia.com/docs/default-source/market-data/historicaldata/{str(year)}/{month_long}/" \
+        url = f"https://www.mcxindia.com/docs/default-source/market-data/historicaldata/{str(year)}/{month_long}/" \
             f"ccl_delivery.xlsx"
         data_df = pd.read_excel(url)
     except Exception as e:
@@ -353,22 +354,23 @@ def get_trading_statistics(year:int = 2023, month_number:int = 9) -> pd.DataFram
     month_long = calendar.month_name[month_number].lower()
     month_short = calendar.month_abbr[month_number].lower()
     try:
-        url=f"https://www.mcxindia.com/docs/default-source/market-data/historicaldata/{str(year)}/{month_long}/" \
+        url = f"https://www.mcxindia.com/docs/default-source/market-data/historicaldata/{str(year)}/{month_long}/" \
             f"trading-statistics-{month_short}-{str(year)}.xlsx"
         data_df = pd.read_excel(url, skipfooter=5)
     except Exception as e:
         raise ValueError(f" apply valid parameter : MCX error:{e}")
     data_df.rename(columns={"Mode of Trading (% of Turnover)": "Mode of ALGO Trading (% of Turnover)",
-                    "Unnamed: 25": "Mode of Non-ALGO Trading (% of Turnover)"},inplace=True)
+                            "Unnamed: 25": "Mode of Non-ALGO Trading (% of Turnover)"},inplace=True)
     data_df.dropna(inplace=True)
     data_df.reset_index(inplace=True)
     data_df.drop(columns='index', inplace=True)
     return data_df
 
 
-# if __name__ == '__main__':
-#     df = get_recent_expires(commodity='COPPER')
-#     print(df.columns)
-#     print(df)
+if __name__ == '__main__':
+    import mcxlib
+    df = mcxlib.get_recent_expires(commodity='COPPER')
+    print(df.columns)
+    print(df)
 
 
