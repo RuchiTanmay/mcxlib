@@ -1,6 +1,9 @@
 # CHANGE LOG
 #### All the changes are listed...
 
+### Version: 0.2 [10/04/2026]
+* fixed some issues and readme file changes
+
 ### Version: 0.1 [03/11/2023]
 * Initial structure of the library .
 * publish with (get_market_watch, get_top_gainers, get_heat_map, get_top_gainers, 

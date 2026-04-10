@@ -1,8 +1,13 @@
 # created by virtualenv automatically
 venv/
+.venv/
 *.csv
 __pycache__/
 *.xml
 build/
 dist/
+pyvenv.cfg
+Lib/
+Scripts/
+
 

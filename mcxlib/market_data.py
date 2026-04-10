@@ -1,5 +1,5 @@
 import pandas as pd
-from .libutil import *
+from mcxlib.libutil import *
 import json
 import calendar
 
@@ -367,7 +367,7 @@ def get_trading_statistics(year:int = 2023, month_number:int = 9) -> pd.DataFram
 
 
 # if __name__ == '__main__':
-#     df = get_recent_expires(commodity='COPPE')
+#     df = get_recent_expires(commodity='COPPER')
 #     print(df.columns)
 #     print(df)
 
