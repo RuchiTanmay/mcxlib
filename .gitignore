@@ -9,5 +9,5 @@ dist/
 pyvenv.cfg
 Lib/
 Scripts/
-
+mcxlib.egg-info/
 
