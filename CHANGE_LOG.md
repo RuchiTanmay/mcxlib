@@ -1,6 +1,9 @@
 # CHANGE LOG
 #### All the changes are listed...
 
+### Version: 0.3 [10/04/2026]
+* fixed some issues 
+
 ### Version: 0.2 [10/04/2026]
 * fixed some issues and readme file changes
 

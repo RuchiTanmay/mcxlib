@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name='mcxlib',
     packages=setuptools.find_packages(),
-    version='0.2',
+    version='0.3',
     include_package_data=True,
     description='python library to get MCX India data',
     long_description=long_description,
