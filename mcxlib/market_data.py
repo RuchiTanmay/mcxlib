@@ -2,6 +2,20 @@ import pandas as pd
 from mcxlib.libutil import *
 import json
 import calendar
+import re
+from datetime import datetime, timedelta, timezone
+
+
+MCX_TIMEZONE = timezone(timedelta(hours=5, minutes=30), "IST")
+_MCX_DATE_PATTERN = re.compile(r"/Date\((-?\d+)(?:[+-]\d+)?\)/")
+
+
+def _parse_mcx_datetime(value: str) -> datetime:
+    match = _MCX_DATE_PATTERN.fullmatch(str(value).strip())
+    if not match:
+        raise ValueError(f"Invalid MCX datetime value: {value}")
+    timestamp_ms = int(match.group(1))
+    return datetime.fromtimestamp(timestamp_ms / 1000, tz=timezone.utc).astimezone(MCX_TIMEZONE)
 
 
 def get_recent_expires(commodity:str = 'ALL') -> pd.DataFrame:
@@ -41,6 +55,28 @@ def get_market_watch() -> pd.DataFrame:
     except Exception as e:
         raise ValueError(f" No Data Found : MCX error:{e}")
     return data_df
+
+
+def get_mcx_datetime() -> datetime:
+    """
+    get latest MCX market date and time
+    :return: timezone-aware datetime object in IST
+    """
+    url = "https://www.mcxindia.com/backpage.aspx/GetMarketWatch"
+    payload = {}
+    headers = get_headers(use_for='market-watch')
+    try:
+        data_dict = post_json(url, headers=headers, payload=payload)
+        timestamps = [
+            _parse_mcx_datetime(item['LTT'])
+            for item in data_dict['d']['Data']
+            if item.get('LTT')
+        ]
+    except Exception as e:
+        raise ValueError(f" No MCX date time found : MCX error:{e}")
+    if not timestamps:
+        raise ValueError(" No MCX date time found")
+    return max(timestamps)
 
 
 def get_heat_map() -> pd.DataFrame:
@@ -372,5 +408,3 @@ if __name__ == '__main__':
     df = mcxlib.get_recent_expires(commodity='COPPER')
     print(df.columns)
     print(df)
-
-
