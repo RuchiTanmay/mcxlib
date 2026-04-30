@@ -43,6 +43,78 @@ def get_market_watch() -> pd.DataFrame:
     return data_df
 
 
+def _filter_contract_rows(data_df: pd.DataFrame, filter_value: str, column_names) -> pd.DataFrame:
+    value = str(filter_value).strip().upper()
+    if value == 'ALL':
+        return data_df
+    if not value:
+        raise ValueError("Apply a valid filter value")
+
+    available_columns = [column for column in column_names if column in data_df.columns]
+    if not available_columns:
+        raise ValueError(f" No matching columns found to filter {filter_value}")
+
+    exact_mask = pd.Series(False, index=data_df.index)
+    contains_mask = pd.Series(False, index=data_df.index)
+    for column in available_columns:
+        column_data = data_df[column].fillna('').astype(str).str.strip().str.upper()
+        exact_mask = exact_mask | (column_data == value)
+        contains_mask = contains_mask | column_data.str.contains(value, regex=False)
+
+    filtered_df = data_df[exact_mask].copy()
+    if filtered_df.empty:
+        filtered_df = data_df[contains_mask].copy()
+    return filtered_df
+
+
+def get_available_contracts(commodity:str = 'ALL',
+                            instrument:str = 'ALL') -> pd.DataFrame:
+    """
+    get available contracts with live market details from MCX
+    :param commodity: commodity name/symbol such as 'LEADMINI', 'CRUDEOIL', 'GOLD' or 'ALL'
+    :param instrument: instrument type such as 'FUTCOM', 'FUTIDX', 'OPTCOM', 'OPTFUT' or 'ALL'
+    :return: panda dataframe
+    """
+    url = "https://www.mcxindia.com/backpage.aspx/GetMarketWatch"
+    payload = {}
+    headers = get_headers(use_for='market-watch')
+    try:
+        data_dict = post_json(url, headers=headers, payload=payload)
+        data_df = pd.DataFrame.from_dict(data_dict['d']['Data'])
+        data_df.drop(columns=['__type'], inplace=True, errors='ignore')
+    except Exception as e:
+        raise ValueError(f" No contracts data found / Invalid request : MCX error:{e}")
+
+    commodity_columns = [
+        'Symbol',
+        'Commodity',
+        'CommodityName',
+        'Product',
+        'ProductName',
+        'ContractName',
+        'InstrumentIdentifier',
+        'Instrument_Identifier',
+    ]
+    instrument_columns = [
+        'InstrumentName',
+        'Instrument',
+        'InstrumentType',
+        'Instrument_Type',
+    ]
+
+    data_df = _filter_contract_rows(data_df, commodity, commodity_columns)
+    if data_df.empty:
+        raise ValueError("Apply a valid commodity name")
+
+    data_df = _filter_contract_rows(data_df, instrument, instrument_columns)
+    if data_df.empty:
+        raise ValueError("Apply a valid instrument name")
+
+    data_df.reset_index(inplace=True)
+    data_df.drop(columns='index', inplace=True)
+    return data_df
+
+
 def get_heat_map() -> pd.DataFrame:
     """
     get live market heat map on MCX
@@ -372,5 +444,4 @@ if __name__ == '__main__':
     df = mcxlib.get_recent_expires(commodity='COPPER')
     print(df.columns)
     print(df)
-
 

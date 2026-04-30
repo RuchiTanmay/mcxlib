@@ -6,7 +6,7 @@ It provides a lightweight wrapper around common MCX endpoints so you can pull ma
 
 ## What It Provides
 
-- Live market data such as market watch, heat map, top gainers, and top losers
+- Live market data such as market watch, available contracts, heat map, top gainers, and top losers
 - Derivatives data such as option chain, put-call ratio, and most active contracts
 - Historical reports such as bhav copy, date-wise historical data, and trading statistics
 - MCX index and participant-level datasets such as iCOMDEX indices and PRO/CLI details
@@ -73,6 +73,7 @@ All exported functions return a `pandas.DataFrame`.
 ### Live Market Data
 
 - `get_market_watch()`
+- `get_available_contracts(commodity="ALL", instrument="ALL")`
 - `get_heat_map()`
 - `get_top_gainers()`
 - `get_top_losers()`
@@ -118,6 +119,19 @@ import mcxlib
 df = mcxlib.get_market_watch()
 print(df.columns)
 print(df.head())
+```
+
+Fetch live contracts for a commodity and convert them to JSON:
+
+```python
+import mcxlib
+
+df = mcxlib.get_available_contracts(
+    commodity="LEADMINI",
+    instrument="FUTCOM",
+)
+
+print(df.to_json(orient="records"))
 ```
 
 Fetch historical data for analysis:
