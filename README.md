@@ -68,10 +68,11 @@ historical_data = mcxlib.get_historical_data(
 
 ## Public API
 
-All exported functions return a `pandas.DataFrame`.
+Most exported functions return a `pandas.DataFrame`. `get_mcx_datetime()` returns a timezone-aware Python `datetime` object in IST.
 
 ### Live Market Data
 
+- `get_mcx_datetime()`
 - `get_market_watch()`
 - `get_heat_map()`
 - `get_top_gainers()`
