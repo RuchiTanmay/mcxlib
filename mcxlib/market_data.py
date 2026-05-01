@@ -462,8 +462,9 @@ def get_trading_statistics(year:int = 2023, month_number:int = 9) -> pd.DataFram
     month_long = calendar.month_name[month_number].lower()
     month_short = calendar.month_abbr[month_number].lower()
     try:
-        url = f"https://www.mcxindia.com/docs/default-source/market-data/historicaldata/{str(year)}/{month_long}/" \
-            f"trading-statistics-{month_short}-{str(year)}.xlsx"
+        url = (f"https://www.mcxindia.com/docs/default-source/market-data/historicaldata/"
+                f"{year}/{month_long}/trading-statistics-{month_short}-{year}.xlsx")
+        print(url)
         data_df = pd.read_excel(url, skipfooter=5)
     except Exception as e:
         raise ValueError(f" apply valid parameter : MCX error:{e}")
@@ -475,8 +476,9 @@ def get_trading_statistics(year:int = 2023, month_number:int = 9) -> pd.DataFram
     return data_df
 
 
-if __name__ == '__main__':
-    import mcxlib
-    df = mcxlib.get_recent_expires(commodity='COPPER')
-    print(df.columns)
-    print(df)
+# if __name__ == '__main__':
+#     import mcxlib
+    # df = mcxlib.get_recent_expires(commodity='COPPER')
+    # df = get_trading_statistics(year=2025, month_number=9)
+    # print(df.columns)
+    # print(df)
